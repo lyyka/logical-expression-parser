@@ -1,41 +1,5 @@
 <?php
 
-class Node {
-    private string $value;
-    private ?Node $left;
-    private ?Node $right;
-
-    public function __construct(string $value, Node $left = null, Node $right = null) {
-        $this->value = $value;
-        $this->left = $left;
-        $this->right = $right;
-    }
-
-    public function getLeft() : ?Node
-    {
-        return $this->left;
-    }
-
-    public function getRight() : ?Node
-    {
-        return $this->right;
-    }
-
-    public function setLeft(?Node $node)
-    {
-        $this->left = $node;
-    }
-
-    public function setRight(?Node $node)
-    {
-        $this->right = $node;
-    }
-
-    public function getValue() : string {
-        return $this->value;
-    }
-}
-
 class AdServer {
 
     private $index;
@@ -192,9 +156,11 @@ class Test {
 
             $output = $server->shouldAdBeServed($publisher, $advertiser); 
 
-            die($output . "\n");
+            echo(($output ? 'true' : 'false') . " = " . $expected . "\n");
         }
     }
 }
 
 (new Test())->test();
+
+?>
