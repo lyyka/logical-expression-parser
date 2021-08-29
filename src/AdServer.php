@@ -155,9 +155,8 @@ class AdServer {
 
     /**
      * Evaluate input string
-     * Scope = (...)
-     * Expression = param=val
-     * Scope value is defined by one or more expressions
+     * Scope = (...), anything between a set of parenthesis. It is defined by multiple expressions (or none)
+     * Expression = param=val, represents a part of the scope
      * @param string $conditions
      * @return bool
      */
