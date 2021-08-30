@@ -16,8 +16,13 @@ class AdServer {
      */
     private bool $withStringArray;
 
+    /**
+     * AdServer constructor.
+     *
+     * @param boolean $withNumericIntervals
+     * @param boolean $withStringArray
+     */
     public function __construct(bool $withNumericIntervals = true, bool $withStringArray = true) {
-        // Set the starting index to always be null
         $this->index = 0;
         $this->withNumericIntervals = $withNumericIntervals;
         $this->withStringArray = $withStringArray;
@@ -34,6 +39,11 @@ class AdServer {
         if(count($publisherKeyValues) == 0) {
             // or throw an exception regarding no values being passed
             return false;
+        }
+
+        if(strlen($advertiserConditions) == 0) {
+            // or throw an exception regarding no conditions given
+            return true;
         }
 
         // Replace textual representations of these operators with their sign values for easier parsing
@@ -203,7 +213,7 @@ class AdServer {
 
                     // Skip one more char for <= and >= signs, so the '=' after >/< gets skipped
                     $sign = $char;
-                    if($this->index + 1 < $max && $char != '=' &&  $conditions[$this->index + 1] == "="){
+                    if($this->index + 1 < $max && $char != '=' && $conditions[$this->index + 1] == "="){
                         $sign .= '=';
                         $this->index++;
                     } else if($this->index + 1 == $max) {
@@ -214,6 +224,11 @@ class AdServer {
                     $comparisonValue = "";
                     for(++$this->index; $this->index < $max && $conditions[$this->index] != ' ' && $conditions[$this->index] != ')'; $this->index++) {
                         $comparisonValue .= $conditions[$this->index];
+                    }
+
+                    // If we have read the comparison value up until the closing bracket, decrease the index, so the next iteration can catch the bracket and end the scope
+                    if($this->index < $max && $conditions[$this->index] == ')') {
+                        $this->index--;
                     }
 
                     // This variable will store value for this specific expression
@@ -249,7 +264,6 @@ class AdServer {
                         }
 
                         $expressionEval = $this->parseAndEvaluateNumericInterval($valueFromKeyValues, $comparisonValue);
-                        $this->evaluateScope($scopedEval, $expressionEval, $expectedRelation);
                     } else if($this->withStringArray && $this->isStringArray($comparisonValue)) {
                         // Handle wrong type comparison
                         if(!is_string($valueFromKeyValues)) {
@@ -257,7 +271,6 @@ class AdServer {
                         }
 
                         $expressionEval = $this->parseAndEvaluateStringArray($valueFromKeyValues, $comparisonValue);
-                        $this->evaluateScope($scopedEval, $expressionEval, $expectedRelation);
                     } else {
                         // If we have a string value, handle it
 

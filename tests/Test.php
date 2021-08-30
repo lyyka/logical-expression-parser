@@ -61,6 +61,44 @@ class Test {
                 "age<=35 and (category=economics or (category=programming and color=dark)) and ((gender=male and name=Ben,John,Peter,Luka) or (gender=female and name=Jasmine,Marinna,Anya,Emma))",
                 true,
             ],
+            [
+                'Test ultra complicated string',
+                [
+                    'age' => 21,
+                    'gender' => 'female',
+                    'first_letter' => 'B',
+                    'last_letter' => 'D',
+                    'skin' => 'white',
+                    'height' => 175,
+                    'weight' => 82,
+                    'job' => 'programmer',
+                    'education' => 'university'
+                ],
+                "((gender=male and age=[18-32] and ((job=programmer and education=university) or (job=dataScience and education=completed)) and skin=white) or (gender=female and age=[20-30] and first_letter=A,B,C and last_letter=D,E,F and ((height=[150-170] and weight<70) or (height=[170-200] and weight=[70-85])))) and height<250 and weight<150",
+                true,
+            ],
+            [
+                'Test empty string',
+                [
+                    'age' => 21,
+                    'gender' => 'female',
+                    'first_letter' => 'B',
+                    'last_letter' => 'D',
+                    'skin' => 'white',
+                    'height' => 175,
+                    'weight' => 82,
+                    'job' => 'programmer',
+                    'education' => 'university'
+                ],
+                "",
+                true,
+            ],
+            [
+                'Test empty data',
+                [],
+                "",
+                false,
+            ],
         ];
     }
     
