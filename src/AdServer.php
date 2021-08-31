@@ -60,7 +60,7 @@ class AdServer {
     }
 
     /**
-     * Evaluates the scope variable based on value and relation parameters
+     * Evaluates the scope variable based on expression value and relation parameters
      * @param bool|null $scope
      * @param bool $value
      * @param string|null $relation
@@ -100,8 +100,8 @@ class AdServer {
     private function isNumericInterval(string $interval) : bool {
         $count = strlen($interval);
         return $count != 0 && 
-                ($interval[0] == '[' || $interval[0] == '(') && 
-                ($interval[$count - 1] == ']' || $interval[$count - 1] == ')') &&
+                $interval[0] == '[' && 
+                $interval[$count - 1] == ']' &&
                 strpos($interval, "-") !== false;
     }
 
