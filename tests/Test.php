@@ -44,12 +44,6 @@ class Test {
                 false
             ],
             [
-                'Test mismatch between open and closed parenthesis',
-                ['age' => 35, 'category' => 'programming', 'color' => 'white', 'name' => 'Jasmine', 'gender' => 'female'],
-                "(color=white or color=dark) and randomNonExistingKey=test)",
-                false
-            ],
-            [
                 'Test failing string arrays',
                 ['age' => 35, 'gender' => 'male', 'category' => 'programming', 'color' => 'dark', 'name' => 'Marko'],
                 "age<=35 and (category=economics or (category=programming and color=dark)) and ((gender=male and name=Ben,John,Peter,Luka) or (gender=female and name=Jasmine,Marinna,Anya,Emma))",

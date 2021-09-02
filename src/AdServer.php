@@ -7,6 +7,11 @@ class AdServer {
     private int $index;
 
     /**
+     * Weights the number of brackets (in order to throw an error if brackets do not match)
+     */
+    private int $bracketsCounter;
+
+    /**
      * Should enable/disable numeric intervals feature for testing without it
      */
     private bool $withNumericIntervals;
@@ -26,6 +31,7 @@ class AdServer {
         $this->index = 0;
         $this->withNumericIntervals = $withNumericIntervals;
         $this->withStringArray = $withStringArray;
+        $this->bracketsCounter = 0;
     }
 
     /**
@@ -56,6 +62,7 @@ class AdServer {
 
         // Do the parsing and return the result
         $this->index = 0;
+        $this->bracketsCounter = 0;
         return $this->parseAndEvaluateConditions($publisherKeyValues, $advertiserConditions);
     }
 
@@ -74,6 +81,9 @@ class AdServer {
             } else if($relation == 'or') {
                 $scope = $scope || $value;
             }
+        } else {
+            $message = $relation ?? "'null'";
+            throw new Exception("Invalid logical operator, expecting [and, or] got $message");
         }
     }
 
@@ -186,12 +196,18 @@ class AdServer {
         // Notice that index is globally defined, so it won't change during recursions and recvert back
         for($this->index = $index; $this->index < $max; $this->index++) {
             if($conditions[$this->index] == '(') {
+                $this->bracketsCounter++;
                 // Opening bracket opens the scope, thus we call the recursion and apply the same logic to the underlaying scope
                 $innerScope = $this->parseAndEvaluateConditions($keyValues, $conditions, ++$this->index);
                 
                 // Evaluate current scope with evaluated brackets
                 $this->evaluateScope($scopedEval, $innerScope, $expectedRelation);
+                $expectedRelation = null;
             } else if($conditions[$this->index] == ')') {
+                if($this->bracketsCounter == 0) {
+                    throw new Exception("Unexpected ')' at position $this->index. It has no matching opening parenthesis.");
+                }
+                $this->bracketsCounter--;
                 // Finish the scope and return it's value
                 return $scopedEval ?? true;
             } else {
@@ -290,6 +306,7 @@ class AdServer {
 
                     // Re-evaluate the current scope with new expression value we now have
                     $this->evaluateScope($scopedEval, $expressionEval, $expectedRelation);
+                    $expectedRelation = null;
 
                     // Clear the buffer to make room for next parameter to load
                     $buffer = "";
@@ -308,6 +325,10 @@ class AdServer {
                     }
                 }
             }
+        }
+
+        if($this->bracketsCounter != 0) {
+            throw new Exception("Brackets missmatch in logical expression");
         }
 
         return $scopedEval ?? true;
